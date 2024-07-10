@@ -1,27 +1,72 @@
-# zardkat 🐱
+# FirstCircuit on Sepolia Testnet 🐱
 
-A [hardhat-circom](https://github.com/projectsophon/hardhat-circom) template to generate zero-knowledge circuits, proofs, and solidity verifiers
+## Introduction
 
-## Quick Start
-Compile the Multiplier2() circuit and verify it against a smart contract verifier
+This project involves the deployment of a custom circuit written in Circom on the Ethereum Sepolia testnet. The circuit includes basic logic gates (AND, OR, NOT) and combines them to form a simple logical operation. The primary functionality of the circuit is encapsulated in the `FirstCircuit` template.
 
+## Circuit Description
+
+### Templates
 ```
 pragma circom 2.0.0;
 
-/*This circuit template checks that c is the multiplication of a and b.*/  
 
-template Multiplier2 () {  
+template FirstCircuit () {  
+   // input signals
+   signal input a;
+   signal input b;
 
-   // Declaration of signals.  
-   signal input a;  
-   signal input b;  
-   signal output c;  
+   // Internal input signals
 
-   // Constraints.  
-   c <== a * b;  
+   signal x;
+   signal y;
+
+   // output signals
+   signal output Q;
+
+   // component
+   component andGate = AND();
+   component orGate = OR();
+   component notGate = NOT();
+
+   // logic
+
+   andGate.a <== a;
+   andGate.b <== b;
+   x <== andGate.y;
+
+   notGate.in <== b;
+   y <== notGate.out;
+
+   orGate.a <== x;
+   orGate.b <== y;
+   Q <== orGate.y;
 }
-component main = Multiplier2();
+
+template AND(){
+   signal input a;
+   signal input b;
+   signal output y;
+   y <== a*b;
+}
+
+template OR(){
+   signal input a;
+   signal input b;
+   signal output y;
+   y <== a + b - a*b;
+}
+
+template NOT() {
+    signal input in;
+    signal output out;
+
+    out <== 1 + in - 2*in;
+}
+
+component main = FirstCircuit();
 ```
+
 ### Install
 `npm i`
 
@@ -30,7 +75,7 @@ component main = Multiplier2();
 This will generate the **out** file with circuit intermediaries and geneate the **MultiplierVerifier.sol** contract
 
 ### Prove and Deploy
-`npx hardhat run scripts/deploy.ts`
+`npx hardhat run scripts/deploy.ts --network sepolia`
 This script does 4 things  
 1. Deploys the MultiplierVerifier.sol contract
 2. Generates a proof from circuit intermediaries with `generateProof()`
@@ -99,7 +144,6 @@ To add a new circuit, you can run the `newcircuit` hardhat task to autogenerate 
 ```
 npx hardhat newcircuit --name newcircuit
 ```
+## Contact 
+For any questions or inquiries, feel free to reach out via Mail(harshdeepsingh2809@gmail.com) or open an issue in the GitHub repository.
 
-**determinism**
-> When you recompile the same circuit using the groth16 protocol, even with no changes, this plugin will apply a new final beacon, changing all the zkey output files. This also causes your Verifier contracts to be updated.
-> For development builds of groth16 circuits, we provide the --deterministic flag in order to use a NON-RANDOM and UNSECURE hardcoded entropy (0x000000 by default) which will allow you to more easily inspect and catch changes in your circuits. You can adjust this default beacon by setting the beacon property on a circuit's config in your hardhat.config.js file.
