@@ -172,3 +172,7 @@ npx hardhat newcircuit --name newcircuit
 ## Contact
 
 For any questions or inquiries, feel free to reach out via email at [arpitdhasmana71@gmail.com](mailto:arpitdhasmana71@gmail.com) or open an issue in the GitHub repository.
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE.md file for details.
